@@ -36,7 +36,7 @@ class RedactingFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         """ filter PII from log message """
         for field in self.fields:
-            record.msg = filter_datum(self.fields, self.REDACTION,
+            record.msg = filter_datum(field, self.REDACTION,
                                       record.msg, self.SEPARATOR)
         return super().format(record)
 
