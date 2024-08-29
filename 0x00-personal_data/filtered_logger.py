@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-0. Regex-ing
+PII(Personally Identifiable Information)
 """
 import logging
 from re import sub
@@ -21,7 +21,7 @@ def filter_datum(fields: List[str], redaction: str,
         message = sub(rf'{obfuscated}=.*?{separator}',
                       rf'{obfuscated}={redaction}{separator}',
                       message)
-    return str(message)
+    return message
 
 
 class RedactingFormatter(logging.Formatter):
