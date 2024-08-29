@@ -4,6 +4,7 @@ PII(Personally Identifiable Information)
 """
 import logging
 import re
+from typing import List
 from mysql.connector import MySQLConnection
 from os import getenv
 
@@ -11,7 +12,7 @@ from os import getenv
 PII_FIELDS = ['name', 'email', 'phone', 'ssn', 'password']
 
 
-def filter_datum(fields: list[str], redaction: str,
+def filter_datum(fields: List[str], redaction: str,
                  message: str, separator: str) -> str:
     """
     returns the log message obfuscated
