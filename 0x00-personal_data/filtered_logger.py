@@ -36,15 +36,6 @@ class RedactingFormatter(logging.Formatter):
         super(RedactingFormatter, self).__init__(self.FORMAT)
         self.fields = fields
 
-    def filter_datum(self, field: str, redaction: str,
-                     message: str, separator: str) -> str:
-        """
-        Returns the log message obfuscated
-        """
-        return re.sub(rf'{field}=.*?{separator}',
-                      rf'{field}={redaction}{separator}',
-                      message)
-
     def format(self, record: logging.LogRecord) -> str:
         """
         Filter PII from log message
@@ -53,3 +44,12 @@ class RedactingFormatter(logging.Formatter):
             record.msg = self.filter_datum(field, self.REDACTION,
                                            record.msg, self.SEPARATOR)
         return super().format(record)
+
+    def filter_datum(self, field: str, redaction: str,
+                     message: str, separator: str) -> str:
+        """
+        Returns the log message obfuscated
+        """
+        return re.sub(rf'{field}=.*?{separator}',
+                      rf'{field}={redaction}{separator}',
+                      message)
