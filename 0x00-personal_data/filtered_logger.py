@@ -44,10 +44,10 @@ def get_logger() -> logging.Logger:
     """ create new logger object with specific config """
     logger = logging.getLogger('user_data')
     logger.setLevel(logging.INFO)
-    logger.propagate = False
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(RedactingFormatter(PII_FIELDS))
     logger.addHandler(stream_handler)
+    logger.propagate = False
     return logger
 
 
