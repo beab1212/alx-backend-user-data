@@ -3,7 +3,7 @@
 PII(Personally Identifiable Information)
 """
 import logging
-from re import sub
+from re import sub, escape
 from typing import List
 from mysql.connector import MySQLConnection
 from os import getenv
@@ -18,9 +18,8 @@ def filter_datum(fields: List[str], redaction: str,
     returns the log message obfuscated
     """
     for obfuscated in fields:
-        message = sub(rf'{obfuscated}=.*?{separator}',
-                      rf'{obfuscated}={redaction}{separator}',
-                      message)
+        message = sub(rf"{escape(obfuscated)}=(.*?){escape(separator)}",
+                      f"{obfuscated}={redaction}{separator}", message)
     return message
 
 
