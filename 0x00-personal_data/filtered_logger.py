@@ -9,7 +9,7 @@ from mysql.connector import MySQLConnection
 from os import getenv
 
 
-PII_FIELDS = ['name', 'email', 'phone', 'ssn', 'password']
+PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
 
 
 def filter_datum(fields: List[str], redaction: str,
