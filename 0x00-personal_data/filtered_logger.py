@@ -3,6 +3,7 @@
 PII(Personally Identifiable Information)
 """
 import logging
+from logging import StreamHandler
 import re
 from typing import List
 from mysql.connector import MySQLConnection
@@ -44,9 +45,9 @@ def get_logger() -> logging.Logger:
     """ create new logger object with specific config """
     logger = logging.getLogger('user_data')
     logger.setLevel(logging.INFO)
-    handler = logging.StreamHandler()
-    handler.setFormatter(RedactingFormatter(PII_FIELDS))
-    logger.addHandler(handler)
+    stream_handler = StreamHandler()
+    stream_handler.setFormatter(RedactingFormatter(PII_FIELDS))
+    logger.addHandler(stream_handler)
     logger.propagate = False
     return logger
 
