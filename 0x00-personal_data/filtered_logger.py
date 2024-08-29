@@ -14,7 +14,9 @@ PII_FIELDS = ['name', 'email', 'phone', 'ssn', 'password']
 
 def filter_datum(fields: List[str], redaction: str,
                  message: str, separator: str) -> str:
-    """ returns the log message obfuscated """
+    """
+    Returns the log message obfuscated
+    """
     for obfuscated in fields:
         message = re.sub(rf'{obfuscated}=.*?{separator}',
                          rf'{obfuscated}={redaction}{separator}',
@@ -23,7 +25,8 @@ def filter_datum(fields: List[str], redaction: str,
 
 
 class RedactingFormatter(logging.Formatter):
-    """ Redacting Formatter class
+    """
+    Redacting Formatter class
     """
     REDACTION = "***"
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
@@ -35,35 +38,18 @@ class RedactingFormatter(logging.Formatter):
 
     def filter_datum(self, field: str, redaction: str,
                      message: str, separator: str) -> str:
-        """ returns the log message obfuscated """
+        """
+        Returns the log message obfuscated
+        """
         return re.sub(rf'{field}=.*?{separator}',
                       rf'{field}={redaction}{separator}',
                       message)
 
     def format(self, record: logging.LogRecord) -> str:
-        """ filter PII from log message """
+        """
+        Filter PII from log message
+        """
         for field in self.fields:
             record.msg = self.filter_datum(field, self.REDACTION,
                                            record.msg, self.SEPARATOR)
         return super().format(record)
-
-
-def get_logger() -> logging.Logger:
-    """ create new logger object with specific config """
-    logger = logging.getLogger('user_data')
-    logger.setLevel(logging.INFO)
-    logger.propagate = False
-    sh = logging.StreamHandler()
-    sh.formatter(RedactingFormatter(PII_FIELDS))
-    logger.addHandler(sh)
-    return logger
-
-
-def get_db() -> MySQLConnection:
-    """ return mysql connector """
-    db_username = getenv('PERSONAL_DATA_DB_USERNAME', default='root')
-    db_password = getenv('PERSONAL_DATA_DB_PASSWORD', default='')
-    db_host = getenv('PERSONAL_DATA_DB_HOST', default='localhost')
-    db = getenv('PERSONAL_DATA_DB_NAME', 'my_db')
-    return MySQLConnection(user=db_username, password=db_password,
-                           host=db_host, database=db)
