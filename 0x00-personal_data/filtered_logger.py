@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-""" 0. Regex-ing  """
+"""
+0. Regex-ing
+"""
 import logging
 from re import sub
 from mysql.connector import MySQLConnection
