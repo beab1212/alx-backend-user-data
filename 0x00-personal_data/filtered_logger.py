@@ -5,8 +5,8 @@ PII(Personally Identifiable Information)
 import logging
 import re
 from typing import List
-import mysql.connector
 import os
+import mysql.connector
 
 
 PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
@@ -52,10 +52,14 @@ def get_logger() -> logging.Logger:
 
 
 def get_db() -> mysql.connector.connection.MySQLConnection:
-    """ return mysql connector """
-    db_username = os.getenv('PERSONAL_DATA_DB_USERNAME', 'root')
-    db_password = os.getenv('PERSONAL_DATA_DB_PASSWORD', '')
-    db_host = os.getenv('PERSONAL_DATA_DB_HOST', 'localhost')
-    db = os.getenv('PERSONAL_DATA_DB_NAME', 'my_db')
-    return mysql.connector.connect(user=db_username, password=db_password,
-                                   host=db_host, database=db)
+    """ Return mysql connector """
+    username = os.getenv('PERSONAL_DATA_DB_USERNAME', 'root')
+    password = os.getenv('PERSONAL_DATA_DB_PASSWORD', '')
+    host = os.getenv('PERSONAL_DATA_DB_HOST', 'localhost')
+    dbname = os.getenv('PERSONAL_DATA_DB_NAME', 'my_db')
+    return mysql.connector.connect(
+        user=username,
+        password=password,
+        host=host,
+        database=dbname
+    )
