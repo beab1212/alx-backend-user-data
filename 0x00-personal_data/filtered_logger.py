@@ -5,7 +5,7 @@ PII(Personally Identifiable Information)
 import logging
 import re
 from typing import List
-from mysql.connector import MySQLConnection
+from mysql.connector import connect, MySQLConnection
 from os import getenv
 
 
@@ -57,5 +57,5 @@ def get_db() -> MySQLConnection:
     db_password = getenv('PERSONAL_DATA_DB_PASSWORD', default='')
     db_host = getenv('PERSONAL_DATA_DB_HOST', default='localhost')
     db = getenv('PERSONAL_DATA_DB_NAME', 'my_db')
-    return MySQLConnection(user=db_username, password=db_password,
-                           host=db_host, database=db)
+    return connect(user=db_username, password=db_password,
+                   host=db_host, database=db)
