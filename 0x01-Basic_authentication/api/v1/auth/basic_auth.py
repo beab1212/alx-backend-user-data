@@ -58,17 +58,14 @@ class BasicAuth(Auth):
                                      user_pwd: str) -> TypeVar('User'):
         """find and validate users credentials
         """
-        if user_email is None or type(user_email) is not str:
-            return None
-        if user_pwd is None or type(user_pwd) is not str:
-            return None
-        user = User.search({'email': user_email})
-        if len(user) == 0:
-            return None
-        if user[0].is_valid_password(user_pwd):
-            return user[0]
-        else:
-            return None
+        if decoded_base64_authorization_header is None:
+            return None, None
+        if type(decoded_base64_authorization_header) is not str:
+            return None, None
+        if ':' not in decoded_base64_authorization_header:
+            return None, None
+        res = decoded_base64_authorization_header.split(':', 1)
+        return res[0], res[-1]
 
     def current_user(self, request=None) -> TypeVar('User'):
         """return current logged in user from auth header
