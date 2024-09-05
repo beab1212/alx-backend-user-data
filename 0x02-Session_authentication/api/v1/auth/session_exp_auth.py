@@ -6,9 +6,6 @@ from datetime import datetime, timedelta
 from api.v1.auth.session_auth import SessionAuth
 
 
-SESSION_DURATION = int(getenv('SESSION_DURATION', default=0))
-
-
 class SessionExpAuth(SessionAuth):
     """Session aut with expiration
     """
@@ -16,7 +13,7 @@ class SessionExpAuth(SessionAuth):
         """ Initialize a SessionAuth instance
         """
         super().__init__()
-        self.session_duration = SESSION_DURATION
+        self.session_duration = int(getenv('SESSION_DURATION', default=0))
 
     def create_session(self, user_id: str = None) -> str:
         """doc
@@ -24,26 +21,28 @@ class SessionExpAuth(SessionAuth):
         session_id = super().create_session(user_id)
         if session_id is None:
             return None
-        current_time = datetime.now()
         self.user_id_by_session_id[session_id] = {'user_id': user_id,
-                                                  'created_at': current_time}
+                                                  'created_at': datetime.now()}
         return session_id
 
     def user_id_for_session_id(self, session_id: str = None) -> str:
         """doc
         """
-        if session_id is None:
+        if session_id is None or session_id not in self.user_id_by_session_id:
             return None
-        session_data = self.user_id_by_session_id.get(session_id)
-        print("Debugging: ", session_data)
-        if session_data is None:
-            return None
+
+        session_data = self.user_id_by_session_id[session_id]
+        user_id = session_data.get('user_id')
+
         if self.session_duration <= 0:
-            return session_data.get('user_id')
-        if session_data.get('created_at') is None:
+            return user_id
+
+        created_at = session_data.get('created_at')
+        if created_at is None:
             return None
-        if (session_data.created_at +
-                timedelta(seconds=self.session_duration) <
-                datetime.now()):
+
+        expiration_time = created_at + timedelta(seconds=self.session_duration)
+        if expiration_time < datetime.now():
             return None
-        return super().user_id_for_session_id(session_id).get('user_id')
+
+        return user_id
