@@ -8,11 +8,6 @@ from models.user_session import UserSession
 class SessionDBAuth(SessionExpAuth):
     """Session management with persistance
     """
-    def __init__(self) -> None:
-        """Initialize a SessionAuth instance
-        """
-        super().__init__()
-
     def create_session(self, user_id: str = None) -> str:
         """Create session id and store it
         """
