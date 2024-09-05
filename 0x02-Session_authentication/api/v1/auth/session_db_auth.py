@@ -17,29 +17,27 @@ class SessionDBAuth(SessionExpAuth):
         """Create session id and store it
         """
         session_id = super().create_session(user_id)
-        UserSession(user_id=user_id, session_id=session_id).save()
-        return session_id
+        if session_id:
+            new_session = UserSession(user_id=user_id, session_id=session_id)
+            new_session.save()
+            return session_id
 
     def user_id_for_session_id(self, session_id: str = None) -> str:
         """Retrieve user_id from session store
         """
-        user_id = UserSession.search({'session_id': session_id})
-        if len(session_id) == 0:
-            return None
-        user_id = user_id[0].get('user_id')
-        return user_id
+        if session_id:
+            user_session = UserSession.search({'session_id': session_id})
+            if user_session and self.session_duration > 0:
+                return user_session[0].user_id
 
     def destroy_session(self, request=None):
         """Remove session from the store
         """
-        if request is None:
-            return False
-        session_id = self.session_cookie(request)
-        if session_id is None:
-            return False
-        session_object = UserSession.search({'session_id': session_id})
-        if len(session_id) == 0:
-            return False
-        session_object[0].remove()
-
-        return super().destroy_session(request)
+        if request:
+            session_id = self.session_cookie(request)
+            if session_id:
+                user_session = UserSession.search({'session_id': session_id})
+                if user_session:
+                    user_session[0].remove()
+                    return True
+        return False
