@@ -5,6 +5,7 @@ from api.v1.views import app_views
 from flask import request, jsonify, abort
 from models.user import User
 from os import getenv
+from api.v1.app import auth
 
 
 SESSION_NAME = getenv('SESSION_NAME', None)
@@ -42,8 +43,7 @@ def login():
 def logout():
     """Logout handler
     """
-    from api.v1.app import auth
-    is_distorted = auth.destroy_session(request)
-    if is_distorted is False:
+    if not auth.destroy_session(request):
         abort(404)
+
     return jsonify({}), 200
