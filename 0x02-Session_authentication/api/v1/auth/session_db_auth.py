@@ -11,28 +11,48 @@ class SessionDBAuth(SessionExpAuth):
     def create_session(self, user_id: str = None) -> str:
         """Create session id and store it
         """
-        session_id = super().create_session(user_id)
-        if session_id:
-            new_session = UserSession(user_id=user_id, session_id=session_id)
-            new_session.save()
-            return session_id
+        if not user_id:
+            return None
+        session_id = str(uuid.uuid4())
+        if not session_id:
+            return None
+        session = UserSession(user_id=user_id, session_id=session_id)
+        session.save()
+        return session_id
 
     def user_id_for_session_id(self, session_id: str = None) -> str:
         """Retrieve user_id from session store
         """
-        if session_id:
-            user_session = UserSession.search({'session_id': session_id})
-            if user_session and self.session_duration > 0:
-                return user_session[0].user_id
+        if not session_id:
+            return None
+        if 'UserSession' not in DATA:
+            return None
+        session = UserSession.search({'session_id': session_id})
+        if not session:
+            return None
+        session = session[0]
+        if self.session_duration <= 0:
+            return session.user_id
+
+        created_at = session.created_at
+        duration = timedelta(seconds=self.session_duration)
+        if (created_at + duration) < datetime.now():
+            return None
+        return session.user_id
 
     def destroy_session(self, request=None):
         """Remove session from the store
         """
-        if request:
-            session_id = self.session_cookie(request)
-            if session_id:
-                user_session = UserSession.search({'session_id': session_id})
-                if user_session:
-                    user_session[0].remove()
-                    return True
-        return False
+        if not request:
+            return False
+        session_id = self.session_cookies(request)
+        if not session_id:
+            return False
+        if 'UserSession' not in DATA:
+            return False
+        session = UserSession.search({'session_id': session_id})
+        if not session:
+            return False
+        session = session[0]
+        session.remove()
+        return True
