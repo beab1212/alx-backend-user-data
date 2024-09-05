@@ -13,40 +13,58 @@ class SessionDBAuth(SessionExpAuth):
         """
         session_id = super().create_session(user_id)
 
-        if isinstance(session_id, str):
-            kwargs = {
-                'user_id': user_id,
-                'session_id': session_id,
-            }
-            user_session = UserSession(**kwargs)
-            user_session.save()
-            return session_id
+        if session_id is None:
+            return None
+
+        kwargs = {'user_id': user_id, 'session_id': session_id}
+        user_session = UserSession(**kwargs)
+        user_session.save()
+        UserSession.save_to_file()
+
+        return session_id
 
     def user_id_for_session_id(self, session_id: str = None) -> str:
         """Retrieve user_id from session store
         """
-        try:
-            sessions = UserSession.search({'session_id': session_id})
-        except Exception:
+        if session_id is None:
             return None
-        if len(sessions) <= 0:
+
+        UserSession.load_from_file()
+        user_sessions = UserSession.search({'session_id': session_id})
+
+        if not user_sessions:
             return None
-        cur_time = datetime.now()
-        time_span = timedelta(seconds=self.session_duration)
-        exp_time = sessions[0].created_at + time_span
-        if exp_time < cur_time:
+
+        user_session = user_sessions[0]
+
+        expired_time = user_session.created_at + \
+            timedelta(seconds=self.session_duration)
+
+        if expired_time < datetime.utcnow():
             return None
-        return sessions[0].user_id
+
+        return user_session.user_id
 
     def destroy_session(self, request=None):
         """Remove session from the store
         """
+        if request is None:
+            return False
+
         session_id = self.session_cookie(request)
+        if session_id is None:
+            return False
+
+        user_sessions = UserSession.search({'session_id': session_id})
+        if not user_sessions:
+            return False
+
+        user_session = user_sessions[0]
+
         try:
-            sessions = UserSession.search({'session_id': session_id})
+            user_session.remove()
+            UserSession.save_to_file()
         except Exception:
             return False
-        if len(sessions) <= 0:
-            return False
-        sessions[0].remove()
+
         return True
