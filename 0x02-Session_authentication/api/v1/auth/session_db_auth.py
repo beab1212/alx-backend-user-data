@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-"""Session management with persistance
+"""Session database authentication
 """
+from datetime import datetime, timedelta
 from api.v1.auth.session_exp_auth import SessionExpAuth
 from models.user_session import UserSession
 
 
 class SessionDBAuth(SessionExpAuth):
-    """Session management with persistance
+    """Session database authentication system
     """
-    def create_session(self, user_id: str = None) -> str:
-        """Create session id and store it
+    def create_session(self, user_id=None):
+        """Create user session
         """
         session_id = super().create_session(user_id)
 
@@ -23,8 +24,8 @@ class SessionDBAuth(SessionExpAuth):
 
         return session_id
 
-    def user_id_for_session_id(self, session_id: str = None) -> str:
-        """Retrieve user_id from session store
+    def user_id_for_session_id(self, session_id=None):
+        """ Retrieve uder ID from session ID
         """
         if session_id is None:
             return None
@@ -46,7 +47,7 @@ class SessionDBAuth(SessionExpAuth):
         return user_session.user_id
 
     def destroy_session(self, request=None):
-        """Remove session from the store
+        """Destroy user session
         """
         if request is None:
             return False
