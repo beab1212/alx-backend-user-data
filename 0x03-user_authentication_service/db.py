@@ -38,12 +38,3 @@ class DB:
         self._session.add(new_user)
         self._session.commit()
         return new_user
-
-    def find_user_by(self, **kwargs) -> User:
-        """
-        """
-        try:
-            user = self.__session.query(User).filter_by(**kwargs).first()
-            return user
-        except (InvalidRequestError, NoResultFound):
-            pass
