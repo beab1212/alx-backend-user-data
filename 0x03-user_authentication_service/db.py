@@ -40,7 +40,7 @@ class DB:
         return new_user
 
     def find_user_by(self, **kwargs) -> User:
-        """doc
+        """finding record by arbitrary arguments
         """
         valid_args = ['id',
                       'email',
@@ -52,7 +52,9 @@ class DB:
                 raise InvalidRequestError
 
         try:
-            user = self._session.query(User).filter_by(**kwargs).one()
+            user = self._session.query(User).filter_by(**kwargs).first()
+            if user is None:
+                raise NoResultFound
         except NoResultFound as error:
             raise error
         return user
