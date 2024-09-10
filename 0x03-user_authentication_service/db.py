@@ -58,3 +58,13 @@ class DB:
         except NoResultFound as error:
             raise error
         return user
+
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """update user by arbitrary arguments
+        """
+        user = self.find_user_by(id=user_id)
+        for key, value in kwargs.items():
+            if hasattr(user, key):
+                setattr(user, key, value)
+            else:
+                raise ValueError
