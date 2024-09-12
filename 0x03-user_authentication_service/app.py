@@ -20,8 +20,8 @@ def index():
 def users():
     """users post handler
     """
-    email = request.form['email']
-    password = request.form['password']
+    email = request.form.get('email')
+    password = request.form.get('password')
 
     try:
         AUTH.register_user(email, password)
@@ -71,6 +71,20 @@ def profile():
     if user is None:
         abort(403)
     return jsonify({"email": f"{user.email}"})
+
+
+@app.route('reset_password', methods=['POST'], strict_slashes=False)
+def get_reset_password_token():
+    """reset password handler
+    """
+    email = request.form.get('email')
+    if email is None:
+        abort(403)
+    try:
+        reset_token = AUTH.get_reset_password_token(email)
+        return jsonify({"email": f"{email}", "reset_token": f"{reset_token}"})
+    except ValueError:
+        abort(403)
 
 
 if __name__ == "__main__":
