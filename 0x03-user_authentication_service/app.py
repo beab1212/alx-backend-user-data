@@ -78,11 +78,10 @@ def get_reset_password_token():
     """reset password handler
     """
     email = request.form.get('email')
-    if email is None:
-        abort(403)
     try:
         reset_token = AUTH.get_reset_password_token(email)
-        return jsonify({"email": f"{email}", "reset_token": f"{reset_token}"})
+        return jsonify({"email": f"{email}",
+                        "reset_token": f"{reset_token}"}), 200
     except ValueError:
         abort(403)
 
